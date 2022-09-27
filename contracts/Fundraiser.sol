@@ -6,3 +6,4 @@ contract Fundraiser{
     constructor(string memory _name)public{
         name = _name;
 }
+}
