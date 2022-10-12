@@ -1,4 +1,6 @@
 const FundraiserContract = artifacts.require("Fundraiser");
+const truffleAssert = require('truffle-assertions');
+
 
 contract("Fundraiser", accounts => {
   let fundraiser;
@@ -19,11 +21,8 @@ contract("Fundraiser", accounts => {
       owner
     )
   });
-});
-
 
   describe("initialization", () => {
-
     it("gets the beneficiary name", async () => {
       const actual = await fundraiser.name();
       assert.equal(actual, name, "names should match");
@@ -57,7 +56,6 @@ contract("Fundraiser", accounts => {
 
   describe("setBeneficiary", () => {
     const newBeneficiary = accounts[2];
-    describe("setBeneficiary", () => {
 
     it("updated beneficiary when called by owner account", async () => {
       await fundraiser.setBeneficiary(newBeneficiary, {from: owner});
@@ -66,14 +64,11 @@ contract("Fundraiser", accounts => {
     });
 
     it("throws and error when called from a non-owner account", async () => {
-      try {
-        await fundraiser.setBeneficiary(newBeneficiary, {from: accounts[3]});
-        assert.fail("withdraw was not restricted to owners")
-      } catch(err) {
-        const expectedError = "Ownable: caller is not the owner"
-        const actualError = err.reason;
-        assert.equal(actualError, expectedError, "should not be permitted")
-      }
-    })
- })
-})
+    await truffleAssert.fails(
+      fundraiser.setBeneficiary(newBeneficiary, { from: accounts[3]}),
+        truffleAssert.ErrorType.REVERT,
+        "Ownable: caller is not the owner"
+      );
+  });
+  });
+});
