@@ -105,12 +105,31 @@ contract("Fundraiser", accounts => {
 
           describe("making donations", ()=>{
 
+            it("emits the DonationReceived event", async() => {
+              const tx = await fundraiser.donate({from: donor, value});
+              const expectedEvent = "DonationReceived";
+              const actualEvent = tx.logs[0].event;
+
+              assert.equal(actualEvent,expectedEvent, "events should match")
+            })
+
+            it("increase donationCount", async()=>{
+              const currentDonationsCount = await fundraiser.donationsCount();
+              await fundraiser.donate({from: donor, value});
+              const newDonationsCount =await fundraiser.donationsCount();
+
+              assert.equal(
+                1,newDonationsCount-currentDonationsCount,
+                "donationsCount should increment by 1"
+              )
+            })
+
             it("increase the totalDonations amaount", async()=>{
               const currentTotalDonations = await fundraiser.totalDonations();
               await fundraiser.donate({from: donor, value});
               const newTotakDonations = await fundraiser.totalDonations();
 
-              const diff = newDonationsCount - currentTotalDonations;
+              const diff = newTotakDonations - currentTotalDonations;
 
               assert.equal(
                 diff,
@@ -120,7 +139,26 @@ contract("Fundraiser", accounts => {
             });
           });
 
+          describe("withdrawing funds",()=>{
+            it("throw an error when called from non-owner account", async()=>{
+              await truffleAssert.fails(
+                fundraiser.withdraw({from:accounts[3]}),
+                truffleAssert.ErrorType.REVERT,
+                "Ownable: caller is not the owner"
 
-    });
-  })
-});
+               );
+              });
+
+            it("permits the owner to call the function",async()=>{
+              try{
+              await fundraiser.withdraw({from:owner});
+              assert(true, "no errors were thrown");
+            }catch(err){
+              assert.fail("should not have thrown owner")
+            }
+          })
+            
+        });
+        });
+      });
+      });

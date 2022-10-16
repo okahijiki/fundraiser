@@ -8,12 +8,17 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 contract Fundraiser is Ownable {
 
+event DonationReceived(address indexed donor, uint256 value);
+
 using SafeMath for uint256;
+
 uint256 public totalDonations;
+uint256 public donationsCount;
 
 struct Donation{
   uint256 value;
   uint256 date;
+
 }
 mapping(address=>Donation[])private _donations;
 
@@ -58,6 +63,9 @@ mapping(address=>Donation[])private _donations;
 
       _donations[msg.sender].push(donation);
       totalDonations = totalDonations.add(msg.value);
+      donationsCount++;
+
+      emit DonationReceived(msg.sender, msg.value);
   }
 
   function myDonations() public view returns(
@@ -76,5 +84,9 @@ mapping(address=>Donation[])private _donations;
         }
 
         return (values, dates);
+    }
+
+    function withdraw() public onlyOwner{
+    
     }
 }
