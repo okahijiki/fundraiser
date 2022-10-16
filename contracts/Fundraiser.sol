@@ -87,6 +87,7 @@ mapping(address=>Donation[])private _donations;
     }
 
     function withdraw() public onlyOwner{
-    
+      uint256 balance = address(this).balance;
+      beneficiary.transfer(balance);
     }
 }
