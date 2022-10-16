@@ -145,7 +145,7 @@ contract("Fundraiser", accounts => {
             {from: accounts[2], value: web3.utils.toWei('0.1')}
           );
         });
-
+          describe("accsess controals", ()=>{
             it("throw an error when called from non-owner account", async()=>{
               await truffleAssert.fails(
               fundraiser.withdraw({from:accounts[3]}),
@@ -153,7 +153,7 @@ contract("Fundraiser", accounts => {
               "Ownable: caller is not the owner"
                );
               });
-
+           });
 
             it("permits the owner to call the function",async()=>{
               try{
