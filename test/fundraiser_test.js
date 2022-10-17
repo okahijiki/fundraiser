@@ -146,6 +146,19 @@ contract("Fundraiser", accounts => {
           );
         });
 
+         it("emits withdraw event", async ()=>{
+           const tx = await fundraiser.withdraw({from: owner});
+           const expectedEvent = "Withdraw";
+           const actualEvent = tx.logs[0].event;
+
+           assert.equal(
+             actualEvent,
+             expectedEvent,
+             "events should match"
+           );
+         })
+       })
+
           describe("accsess controals", ()=>{
             it("throw an error when called from non-owner account", async()=>{
               await truffleAssert.fails(
@@ -200,9 +213,8 @@ contract("Fundraiser", accounts => {
             currentContractBalance,
             "beneficiary should receive all the funds"
             );
-          });
-      　
+          });  　
         });
+
       });
     });
-  });
