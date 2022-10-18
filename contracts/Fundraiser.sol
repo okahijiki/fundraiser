@@ -92,8 +92,9 @@ mapping(address=>Donation[])private _donations;
       emit Withdraw(balance);
     }
 
-    fallback() external payable{
+    fallback () external payable{
       totalDonations = totalDonations.add(msg.value);
       donationsCount++;
+
     }
 }
