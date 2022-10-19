@@ -1,6 +1,6 @@
 
 const FundraiserFactoryContract = artifacts.require("FundraiserFactory");
-const FundraiserContract = artifacts.require("fundraiser");
+const FundraiserContract = artifacts.require("Fundraiser");
 
 contract("FundraiserFactory: deployment", () => {
   it("has been deployed", async () => {
@@ -10,7 +10,6 @@ contract("FundraiserFactory: deployment", () => {
 });
 
 contract("FundraiserFactory: createFundraiser", (accounts) => {
-
   let fundraiserFactory;
   // fundraiser args
   const name =  "Beneficiary Name";
@@ -58,7 +57,6 @@ contract("FundraiserFactory: createFundraiser", (accounts) => {
   });
 });
 
-
 contract("FundraiserFactory: fundraisers", (accounts) => {
   async function createFundraiserFactory(fundraiserCount, accounts) {
     const factory = await FundraiserFactoryContract.new();
@@ -94,40 +92,41 @@ contract("FundraiserFactory: fundraisers", (accounts) => {
     });
   });
 
-  describe("varying limits", async()=>{
+  describe("varying limits", async () => {
     let factory;
-    beforeEach(async ()=>{
+    beforeEach(async () => {
       factory = await createFundraiserFactory(30, accounts);
-    });
+    })
 
-    it("returns 10 results when limit requested is 10" ,async()=>{
-      const fundraisers = await factory.fundraisers(10,0);
+    it("returns 10 results when limit requested is 10", async ()=>{
+      const fundraisers = await factory.fundraisers(10, 0);
       assert.equal(
         fundraisers.length,
         10,
-        " result size should be 10"
+        "results size should be 10"
       );
     });
 
-    it("returns 20 results when limit requested is 20" ,async()=>{
-      const fundraisers = await factory.fundraisers(20,0);
+    it("returns 20 results when limit requested is 20", async ()=>{
+      const fundraisers = await factory.fundraisers(20, 0);
       assert.equal(
         fundraisers.length,
         20,
-        " result size should be 20"
+        "results size should be 20"
       );
     });
 
-    it("returns 20 results when limit requested is 30" ,async()=>{
-      const fundraisers = await factory.fundraisers(30,0);
+    it("returns 20 results when limit requested is 30", async ()=>{
+      const fundraisers = await factory.fundraisers(30, 0);
       assert.equal(
         fundraisers.length,
         20,
-        " result size should be 20"
+        "results size should be 20"
       );
     });
+  })
 
-    describe("varying offset", () => {
+  describe("varying offset", () => {
     let factory;
     beforeEach(async () => {
       factory = await createFundraiserFactory(10, accounts);
@@ -148,5 +147,33 @@ contract("FundraiserFactory: fundraisers", (accounts) => {
     });
   });
 
-  })
+  describe("boundry conditions", () => {
+    let factory;
+    beforeEach(async () => {
+      factory = await createFundraiserFactory(10, accounts);
+    });
+
+    it("raises out of bounds error", async () => {
+      try {
+        await factory.fundraisers(1, 11);
+        assert.fail("error was not raised")
+      } catch(err) {
+        const expected = "offset out of bounds";
+        assert.ok(err.message.includes(expected), `${err.message}`);
+      }
+    });
+
+    it("adjusts return size to prevent out of bounds error", async () => {
+      try {
+        const fundraisers = await factory.fundraisers(10, 5);
+        assert.equal(
+          fundraisers.length,
+          5,
+          "collection adjusted"
+        );
+      } catch(err) {
+        assert.fail("limit and offset exceeded bounds");
+      }
+    });
+  });
 });
