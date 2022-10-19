@@ -35,15 +35,21 @@ contract FundraiserFactory{
     return _fundraisers.length;
  }
 
+ function fundraisers(uint256 limit, uint256 offset)
+         public
+         view
+         returns(Fundraiser[] memory coll)
+     {
 
-  function fundraisers(uint256 limit, uint256 offset)
-        public
-        view
-        returns(Fundraiser[] memory coll)
-    {
-      uint256 size = fundraisersCount()< limit ? fundraisersCount(): limit;
-      size = size < maxLimit ? size : maxLimit;
-      coll = new Fundraiser[](size);
-      return coll;
-    }
+         uint256 size = fundraisersCount() < limit ? fundraisersCount(): limit;
+         size = size < maxLimit ? size : maxLimit;
+         coll = new Fundraiser[](size);
+
+         for(uint256 i = 0; i < size; i++) {
+             coll[i] = _fundraisers[offset + i];
+         }
+
+         return coll;
+     }
+
 }
